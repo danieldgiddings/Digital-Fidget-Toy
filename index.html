@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dans Fidget Toy</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0f; min-height: 100vh; font-family: sans-serif; overflow-x: hidden; }
+  h1 { text-align: center; color: #fff; font-size: 1.4rem; font-weight: 400; padding: 1.5rem; opacity: 0.5; letter-spacing: 0.2em; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; padding: 0 1rem 2rem; }
+
+  .panel { background: #13131a; border-radius: 16px; padding: 1.5rem; border: 1px solid #2a2a3a; }
+  .panel h2 { font-size: 0.75rem; letter-spacing: 0.15em; color: #555; margin-bottom: 1rem; text-transform: uppercase; }
+
+  .bubbles { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+  .bubble { width: 100%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #9b8fff, #4a3fb5); cursor: pointer; transition: all 0.15s; border: 1px solid #6b5fff; }
+  .bubble:hover { transform: scale(1.1); }
+  .bubble.popped { background: #1a1a28; border-color: #2a2a3a; transform: scale(0.85); }
+
+  .sliders { display: flex; flex-direction: column; gap: 12px; }
+  .slider-row { display: flex; align-items: center; gap: 10px; }
+  .slider-row label { width: 12px; font-size: 13px; font-weight: 500; }
+  .slider-row input[type=range] { flex: 1; height: 6px; border-radius: 3px; outline: none; -webkit-appearance: none; cursor: pointer; }
+  .slider-row input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; cursor: pointer; }
+  .color-preview { width: 100%; height: 80px; border-radius: 12px; margin-top: 12px; transition: background 0.1s; border: 1px solid #2a2a3a; }
+  #r-slider::-webkit-slider-runnable-track { background: linear-gradient(to right, #000, #ff0000); border-radius: 3px; height: 6px; }
+  #g-slider::-webkit-slider-runnable-track { background: linear-gradient(to right, #000, #00ff00); border-radius: 3px; height: 6px; }
+  #b-slider::-webkit-slider-runnable-track { background: linear-gradient(to right, #000, #0000ff); border-radius: 3px; height: 6px; }
+  #r-slider::-webkit-slider-thumb { background: #ff4444; }
+  #g-slider::-webkit-slider-thumb { background: #44ff44; }
+  #b-slider::-webkit-slider-thumb { background: #4444ff; }
+
+  #gravity-canvas { width: 100%; height: 200px; border-radius: 12px; cursor: crosshair; display: block; }
+
+  .spin-area { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  #spinner { width: 120px; height: 120px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: conic-gradient(#ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff, #ff6b6b); border: 3px solid #333; }
+  .spin-count { font-size: 2rem; font-weight: 300; color: #fff; }
+  .spin-label { font-size: 0.75rem; color: #555; letter-spacing: 0.1em; }
+
+  #ripple-canvas { width: 100%; height: 200px; border-radius: 12px; cursor: crosshair; display: block; }
+
+  #draw-canvas { width: 100%; height: 200px; border-radius: 12px; cursor: crosshair; display: block; background: #05050a; }
+  .draw-controls { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .color-btn { width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: transform 0.1s; }
+  .color-btn:hover, .color-btn.active { transform: scale(1.2); border-color: #fff; }
+  .clear-btn { background: #1a1a28; color: #888; border: 1px solid #333; border-radius: 8px; padding: 4px 12px; font-size: 12px; cursor: pointer; margin-left: auto; }
+  .clear-btn:hover { color: #fff; border-color: #555; }
+
+  .clicker-area { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  #big-btn { width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #ff8c42, #cc4400); border: 3px solid #ff6020; cursor: pointer; font-size: 2rem; transition: transform 0.08s, box-shadow 0.08s; box-shadow: 0 6px 20px rgba(255,100,30,0.4); }
+  #big-btn:active { transform: scale(0.92); box-shadow: 0 2px 8px rgba(255,100,30,0.3); }
+  .click-count { font-size: 2.5rem; font-weight: 300; color: #ff8c42; }
+  .click-label { font-size: 0.75rem; color: #555; }
+  #click-particles { position: relative; height: 30px; }
+  .particle { position: absolute; font-size: 14px; color: #ff8c42; pointer-events: none; animation: floatUp 0.8s ease-out forwards; }
+  @keyframes floatUp { to { transform: translateY(-40px); opacity: 0; } }
+</style>
+</head>
+<body>
+<h1>DAN'S FIDGET TOY</h1>
+<div class="grid">
+
+  <div class="panel">
+    <h2>bubble wrap</h2>
+    <div class="bubbles" id="bubbles"></div>
+  </div>
+
+  <div class="panel">
+    <h2>color mixer</h2>
+    <div class="sliders">
+      <div class="slider-row"><label style="color:#ff4444">R</label><input type="range" id="r-slider" min="0" max="255" value="138"></div>
+      <div class="slider-row"><label style="color:#44ff44">G</label><input type="range" id="g-slider" min="0" max="255" value="43"></div>
+      <div class="slider-row"><label style="color:#4488ff">B</label><input type="range" id="b-slider" min="0" max="255" value="226"></div>
+    </div>
+    <div class="color-preview" id="color-preview"></div>
+  </div>
+
+  <div class="panel">
+    <h2>gravity balls — click to spawn</h2>
+    <canvas id="gravity-canvas"></canvas>
+  </div>
+
+  <div class="panel">
+    <h2>spin it</h2>
+    <div class="spin-area">
+      <div id="spinner">🌀</div>
+      <div class="spin-count" id="spin-count">0</div>
+      <div class="spin-label">spins</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>ripple pond — click anywhere</h2>
+    <canvas id="ripple-canvas"></canvas>
+  </div>
+
+  <div class="panel">
+    <h2>neon draw</h2>
+    <canvas id="draw-canvas"></canvas>
+    <div class="draw-controls">
+      <div class="color-btn active" data-color="#ff6b6b" style="background:#ff6b6b"></div>
+      <div class="color-btn" data-color="#ffd93d" style="background:#ffd93d"></div>
+      <div class="color-btn" data-color="#6bcb77" style="background:#6bcb77"></div>
+      <div class="color-btn" data-color="#4d96ff" style="background:#4d96ff"></div>
+      <div class="color-btn" data-color="#c77dff" style="background:#c77dff"></div>
+      <div class="color-btn" data-color="#ff9f43" style="background:#ff9f43"></div>
+      <button class="clear-btn" id="clear-draw">clear</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>big button</h2>
+    <div class="clicker-area">
+      <div class="click-count" id="click-count">0</div>
+      <div class="click-label">clicks</div>
+      <div id="click-particles"></div>
+      <button id="big-btn">👆</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const bubblesEl = document.getElementById('bubbles');
+for(let i=0;i<48;i++){
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  b.onclick = () => {
+    if(!b.classList.contains('popped')){
+      b.classList.add('popped');
+      const ctx = new AudioContext();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = 300 + Math.random()*200;
+      g.gain.setValueAtTime(0.1, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      o.start(); o.stop(ctx.currentTime + 0.08);
+    }
+  };
+  bubblesEl.appendChild(b);
+}
+
+const rS = document.getElementById('r-slider');
+const gS = document.getElementById('g-slider');
+const bS = document.getElementById('b-slider');
+const preview = document.getElementById('color-preview');
+function updateColor(){ preview.style.background = `rgb(${rS.value},${gS.value},${bS.value})`; }
+rS.oninput = gS.oninput = bS.oninput = updateColor;
+updateColor();
+
+const gc = document.getElementById('gravity-canvas');
+gc.width = gc.offsetWidth; gc.height = 200;
+const gctx = gc.getContext('2d');
+const balls = [];
+const colors = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#c77dff','#ff9f43'];
+gc.onclick = (e) => {
+  const r = gc.getBoundingClientRect();
+  balls.push({ x: e.clientX-r.left, y: e.clientY-r.top, vx: (Math.random()-0.5)*4, vy: -3, r: 8+Math.random()*10, c: colors[Math.floor(Math.random()*colors.length)] });
+};
+function animGravity(){
+  gctx.clearRect(0,0,gc.width,gc.height);
+  balls.forEach(b => {
+    b.vy += 0.3; b.x += b.vx; b.y += b.vy;
+    if(b.y+b.r>gc.height){ b.y=gc.height-b.r; b.vy*=-0.65; b.vx*=0.95; }
+    if(b.x-b.r<0){ b.x=b.r; b.vx*=-0.7; }
+    if(b.x+b.r>gc.width){ b.x=gc.width-b.r; b.vx*=-0.7; }
+    gctx.beginPath(); gctx.arc(b.x,b.y,b.r,0,Math.PI*2); gctx.fillStyle=b.c; gctx.fill();
+  });
+  if(balls.length>40) balls.splice(0,1);
+  requestAnimationFrame(animGravity);
+}
+animGravity();
+
+const spinner = document.getElementById('spinner');
+const spinCount = document.getElementById('spin-count');
+let angle=0, spins=0, spinning=false, spinV=0;
+spinner.onclick = () => { spinV+=40; spinning=true; };
+function animSpin(){
+  if(spinning){
+    angle+=spinV; spinV*=0.96;
+    spinner.style.transform=`rotate(${angle}deg)`;
+    const newSpins=Math.floor(angle/360);
+    if(newSpins>spins){ spins=newSpins; spinCount.textContent=spins; }
+    if(spinV<0.5) spinning=false;
+  }
+  requestAnimationFrame(animSpin);
+}
+animSpin();
+
+const rc = document.getElementById('ripple-canvas');
+rc.width=rc.offsetWidth; rc.height=200;
+const rctx = rc.getContext('2d');
+const ripples = [];
+rc.onclick = (e) => {
+  const r=rc.getBoundingClientRect();
+  ripples.push({ x:e.clientX-r.left, y:e.clientY-r.top, radius:0, alpha:1, color:colors[Math.floor(Math.random()*colors.length)] });
+};
+function animRipple(){
+  rctx.clearRect(0,0,rc.width,rc.height);
+  for(let i=ripples.length-1;i>=0;i--){
+    const rp=ripples[i]; rp.radius+=3; rp.alpha-=0.015;
+    if(rp.alpha<=0){ ripples.splice(i,1); continue; }
+    rctx.beginPath(); rctx.arc(rp.x,rp.y,rp.radius,0,Math.PI*2);
+    rctx.strokeStyle=rp.color; rctx.globalAlpha=rp.alpha; rctx.lineWidth=2; rctx.stroke(); rctx.globalAlpha=1;
+  }
+  requestAnimationFrame(animRipple);
+}
+animRipple();
+
+const dc = document.getElementById('draw-canvas');
+dc.width=dc.offsetWidth; dc.height=200;
+const dctx = dc.getContext('2d');
+let drawing=false, drawColor='#ff6b6b', lastX=0, lastY=0;
+dctx.lineCap='round'; dctx.lineJoin='round'; dctx.lineWidth=3;
+dc.onmousedown=(e)=>{ drawing=true; const r=dc.getBoundingClientRect(); lastX=e.clientX-r.left; lastY=e.clientY-r.top; };
+dc.onmousemove=(e)=>{
+  if(!drawing) return;
+  const r=dc.getBoundingClientRect(); const x=e.clientX-r.left, y=e.clientY-r.top;
+  dctx.strokeStyle=drawColor; dctx.shadowBlur=10; dctx.shadowColor=drawColor;
+  dctx.beginPath(); dctx.moveTo(lastX,lastY); dctx.lineTo(x,y); dctx.stroke();
+  lastX=x; lastY=y;
+};
+dc.onmouseup=dc.onmouseleave=()=>drawing=false;
+document.querySelectorAll('.color-btn').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.color-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); drawColor=btn.dataset.color;
+  };
+});
+document.getElementById('clear-draw').onclick=()=>dctx.clearRect(0,0,dc.width,dc.height);
+
+let clicks=0;
+const clickCount=document.getElementById('click-count');
+const bigBtn=document.getElementById('big-btn');
+const particlesEl=document.getElementById('click-particles');
+bigBtn.onclick=()=>{
+  clicks++; clickCount.textContent=clicks;
+  const p=document.createElement('div'); p.className='particle'; p.textContent='+1';
+  p.style.left=(Math.random()*80+10)+'%'; particlesEl.appendChild(p);
+  setTimeout(()=>p.remove(),800);
+};
+</script>
+</body>
+</html>
