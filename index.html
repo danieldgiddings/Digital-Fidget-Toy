@@ -3,101 +3,118 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dans Fidget Toy</title>
+<title>Dan's Panda Fidget Toy</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #0a0a0f; min-height: 100vh; font-family: sans-serif; overflow-x: hidden; }
-  h1 { text-align: center; color: #fff; font-size: 1.4rem; font-weight: 400; padding: 1.5rem; opacity: 0.5; letter-spacing: 0.2em; }
-
+  .header { text-align: center; padding: 2rem 1rem 1rem; }
+  .header h1 { color: #fff; font-size: 1.6rem; font-weight: 400; letter-spacing: 0.2em; opacity: 0.9; }
+  .header p { color: #555; font-size: 0.8rem; margin-top: 0.5rem; letter-spacing: 0.1em; }
+  .panda-row { font-size: 1.5rem; margin: 0.5rem 0; }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; padding: 0 1rem 2rem; }
-
   .panel { background: #13131a; border-radius: 16px; padding: 1.5rem; border: 1px solid #2a2a3a; }
   .panel h2 { font-size: 0.75rem; letter-spacing: 0.15em; color: #555; margin-bottom: 1rem; text-transform: uppercase; }
-
   .bubbles { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
-  .bubble { width: 100%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #9b8fff, #4a3fb5); cursor: pointer; transition: all 0.15s; border: 1px solid #6b5fff; }
+  .bubble { width: 100%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #9b8fff, #4a3fb5); cursor: pointer; transition: all 0.15s; border: 1px solid #6b5fff; display: flex; align-items: center; justify-content: center; font-size: 10px; }
   .bubble:hover { transform: scale(1.1); }
   .bubble.popped { background: #1a1a28; border-color: #2a2a3a; transform: scale(0.85); }
-
   .sliders { display: flex; flex-direction: column; gap: 12px; }
   .slider-row { display: flex; align-items: center; gap: 10px; }
   .slider-row label { width: 12px; font-size: 13px; font-weight: 500; }
   .slider-row input[type=range] { flex: 1; height: 6px; border-radius: 3px; outline: none; -webkit-appearance: none; cursor: pointer; }
   .slider-row input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; cursor: pointer; }
-  .color-preview { width: 100%; height: 80px; border-radius: 12px; margin-top: 12px; transition: background 0.1s; border: 1px solid #2a2a3a; }
+  .color-preview { width: 100%; height: 80px; border-radius: 12px; margin-top: 12px; transition: background 0.1s; border: 1px solid #2a2a3a; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
   #r-slider::-webkit-slider-runnable-track { background: linear-gradient(to right, #000, #ff0000); border-radius: 3px; height: 6px; }
   #g-slider::-webkit-slider-runnable-track { background: linear-gradient(to right, #000, #00ff00); border-radius: 3px; height: 6px; }
   #b-slider::-webkit-slider-runnable-track { background: linear-gradient(to right, #000, #0000ff); border-radius: 3px; height: 6px; }
   #r-slider::-webkit-slider-thumb { background: #ff4444; }
   #g-slider::-webkit-slider-thumb { background: #44ff44; }
   #b-slider::-webkit-slider-thumb { background: #4444ff; }
-
   #gravity-canvas { width: 100%; height: 200px; border-radius: 12px; cursor: crosshair; display: block; }
-
   .spin-area { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-  #spinner { width: 120px; height: 120px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: conic-gradient(#ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff, #ff6b6b); border: 3px solid #333; }
+  #spinner { width: 120px; height: 120px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 3rem; background: conic-gradient(#ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff, #ff6b6b); border: 3px solid #333; }
   .spin-count { font-size: 2rem; font-weight: 300; color: #fff; }
   .spin-label { font-size: 0.75rem; color: #555; letter-spacing: 0.1em; }
-
   #ripple-canvas { width: 100%; height: 200px; border-radius: 12px; cursor: crosshair; display: block; }
-
   #draw-canvas { width: 100%; height: 200px; border-radius: 12px; cursor: crosshair; display: block; background: #05050a; }
-  .draw-controls { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .draw-controls { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
   .color-btn { width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: transform 0.1s; }
   .color-btn:hover, .color-btn.active { transform: scale(1.2); border-color: #fff; }
   .clear-btn { background: #1a1a28; color: #888; border: 1px solid #333; border-radius: 8px; padding: 4px 12px; font-size: 12px; cursor: pointer; margin-left: auto; }
   .clear-btn:hover { color: #fff; border-color: #555; }
-
   .clicker-area { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-  #big-btn { width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #ff8c42, #cc4400); border: 3px solid #ff6020; cursor: pointer; font-size: 2rem; transition: transform 0.08s, box-shadow 0.08s; box-shadow: 0 6px 20px rgba(255,100,30,0.4); }
-  #big-btn:active { transform: scale(0.92); box-shadow: 0 2px 8px rgba(255,100,30,0.3); }
-  .click-count { font-size: 2.5rem; font-weight: 300; color: #ff8c42; }
+  #panda-btn { width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #ffffff, #cccccc); border: 3px solid #aaa; cursor: pointer; font-size: 3.5rem; transition: transform 0.08s, box-shadow 0.08s; box-shadow: 0 6px 20px rgba(255,255,255,0.2); line-height: 110px; text-align: center; }
+  #panda-btn:active { transform: scale(0.92); }
+  .click-count { font-size: 2.5rem; font-weight: 300; color: #fff; }
   .click-label { font-size: 0.75rem; color: #555; }
   #click-particles { position: relative; height: 30px; }
-  .particle { position: absolute; font-size: 14px; color: #ff8c42; pointer-events: none; animation: floatUp 0.8s ease-out forwards; }
-  @keyframes floatUp { to { transform: translateY(-40px); opacity: 0; } }
+  .particle { position: absolute; font-size: 16px; pointer-events: none; animation: floatUp 0.9s ease-out forwards; }
+  @keyframes floatUp { to { transform: translateY(-50px); opacity: 0; } }
+  .whack-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .whack-score { color: #ffd93d; font-size: 1rem; font-weight: 500; }
+  .whack-timer { color: #ff6b6b; font-size: 0.9rem; }
+  .whack-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .hole { background: #0d0d18; border-radius: 50%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; cursor: pointer; border: 2px solid #1a1a2e; transition: transform 0.1s; }
+  .hole.active { background: #1a1a35; border-color: #4a4a8a; }
+  .hole:active { transform: scale(0.95); }
+  .game-btn { color: #fff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 13px; cursor: pointer; width: 100%; margin-top: 10px; }
+  .whack-btn { background: #4a3fb5; }
+  .whack-btn:hover { background: #5a4fc5; }
+  .catch-btn { background: #1d6b3a; }
+  .catch-btn:hover { background: #2d8a4a; }
+  #catch-area { position: relative; height: 200px; background: #0d0d18; border-radius: 12px; overflow: hidden; cursor: crosshair; }
+  #running-panda { position: absolute; font-size: 2rem; cursor: pointer; user-select: none; left: 50px; top: 50px; }
+  .catch-stats { display: flex; justify-content: space-between; margin-top: 10px; }
+  .catch-stat { font-size: 0.85rem; color: #888; }
+  .catch-stat span { color: #fff; font-weight: 500; }
+  .game-best { font-size: 0.85rem; color: #ffd93d; text-align: center; margin-top: 6px; min-height: 20px; }
 </style>
 </head>
 <body>
-<h1>DAN'S FIDGET TOY</h1>
+<div class="header">
+  <div class="panda-row">🐼 🐾 🐼 🐾 🐼 🐾 🐼</div>
+  <h1>DAN'S PANDA FIDGET TOY</h1>
+  <p>🎋 bamboo-powered entertainment 🎋</p>
+  <div class="panda-row">🐾 🐼 🐾 🐼 🐾 🐼 🐾</div>
+</div>
 <div class="grid">
 
   <div class="panel">
-    <h2>bubble wrap</h2>
+    <h2>🐼 panda bubble wrap</h2>
     <div class="bubbles" id="bubbles"></div>
   </div>
 
   <div class="panel">
-    <h2>color mixer</h2>
+    <h2>🎨 panda color mixer</h2>
     <div class="sliders">
       <div class="slider-row"><label style="color:#ff4444">R</label><input type="range" id="r-slider" min="0" max="255" value="138"></div>
       <div class="slider-row"><label style="color:#44ff44">G</label><input type="range" id="g-slider" min="0" max="255" value="43"></div>
       <div class="slider-row"><label style="color:#4488ff">B</label><input type="range" id="b-slider" min="0" max="255" value="226"></div>
     </div>
-    <div class="color-preview" id="color-preview"></div>
+    <div class="color-preview" id="color-preview">🐼</div>
   </div>
 
   <div class="panel">
-    <h2>gravity balls — click to spawn</h2>
+    <h2>🐼 gravity pandas — click to drop</h2>
     <canvas id="gravity-canvas"></canvas>
   </div>
 
   <div class="panel">
-    <h2>spin it</h2>
+    <h2>🌀 spin the panda</h2>
     <div class="spin-area">
-      <div id="spinner">🌀</div>
+      <div id="spinner">🐼</div>
       <div class="spin-count" id="spin-count">0</div>
       <div class="spin-label">spins</div>
     </div>
   </div>
 
   <div class="panel">
-    <h2>ripple pond — click anywhere</h2>
+    <h2>🐾 panda pond — click to ripple</h2>
     <canvas id="ripple-canvas"></canvas>
   </div>
 
   <div class="panel">
-    <h2>neon draw</h2>
+    <h2>✏️ neon panda draw</h2>
     <canvas id="draw-canvas"></canvas>
     <div class="draw-controls">
       <div class="color-btn active" data-color="#ff6b6b" style="background:#ff6b6b"></div>
@@ -111,137 +128,164 @@
   </div>
 
   <div class="panel">
-    <h2>big button</h2>
+    <h2>🐼 panda clicker</h2>
     <div class="clicker-area">
       <div class="click-count" id="click-count">0</div>
-      <div class="click-label">clicks</div>
+      <div class="click-label">bamboo collected 🎋</div>
       <div id="click-particles"></div>
-      <button id="big-btn">👆</button>
+      <button id="panda-btn">🐼</button>
     </div>
   </div>
 
-</div>
+  <div class="panel">
+    <h2>🔨 whack-a-panda</h2>
+    <div class="whack-header">
+      <div class="whack-score">score: <span id="whack-score">0</span></div>
+      <div class="whack-timer">time: <span id="whack-timer">30</span>s</div>
+    </div>
+    <div class="whack-grid" id="whack-grid"></div>
+    <div class="game-best" id="whack-best"></div>
+    <button class="game-btn whack-btn" id="whack-start">start game</button>
+  </div>
 
+  <div class="panel">
+    <h2>🏃 catch the panda</h2>
+    <div id="catch-area">
+      <div id="running-panda">🐼</div>
+    </div>
+    <div class="catch-stats">
+      <div class="catch-stat">caught: <span id="catch-count">0</span></div>
+      <div class="catch-stat">misses: <span id="miss-count">0</span></div>
+      <div class="catch-stat">time: <span id="catch-timer">30</span>s</div>
+    </div>
+    <div class="game-best" id="catch-best"></div>
+    <button class="game-btn catch-btn" id="catch-start">start game</button>
+  </div>
+
+</div>
 <script>
-const bubblesEl = document.getElementById('bubbles');
+// BUBBLES
+const bubblesEl=document.getElementById('bubbles');
 for(let i=0;i<48;i++){
-  const b = document.createElement('div');
-  b.className = 'bubble';
-  b.onclick = () => {
+  const b=document.createElement('div');b.className='bubble';
+  b.textContent=Math.random()>0.7?'🐼':'';
+  b.onclick=()=>{
     if(!b.classList.contains('popped')){
-      b.classList.add('popped');
-      const ctx = new AudioContext();
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.frequency.value = 300 + Math.random()*200;
-      g.gain.setValueAtTime(0.1, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-      o.start(); o.stop(ctx.currentTime + 0.08);
+      b.classList.add('popped');b.textContent='💨';
+      const ctx=new AudioContext(),o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=300+Math.random()*200;
+      g.gain.setValueAtTime(0.1,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.08);
+      o.start();o.stop(ctx.currentTime+0.08);
     }
   };
   bubblesEl.appendChild(b);
 }
 
-const rS = document.getElementById('r-slider');
-const gS = document.getElementById('g-slider');
-const bS = document.getElementById('b-slider');
-const preview = document.getElementById('color-preview');
-function updateColor(){ preview.style.background = `rgb(${rS.value},${gS.value},${bS.value})`; }
-rS.oninput = gS.oninput = bS.oninput = updateColor;
-updateColor();
+// COLOR MIXER
+const rS=document.getElementById('r-slider'),gS=document.getElementById('g-slider'),bS=document.getElementById('b-slider');
+const preview=document.getElementById('color-preview');
+function updateColor(){preview.style.background=`rgb(${rS.value},${gS.value},${bS.value})`;}
+rS.oninput=gS.oninput=bS.oninput=updateColor;updateColor();
 
-const gc = document.getElementById('gravity-canvas');
-gc.width = gc.offsetWidth; gc.height = 200;
-const gctx = gc.getContext('2d');
-const balls = [];
-const colors = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#c77dff','#ff9f43'];
-gc.onclick = (e) => {
-  const r = gc.getBoundingClientRect();
-  balls.push({ x: e.clientX-r.left, y: e.clientY-r.top, vx: (Math.random()-0.5)*4, vy: -3, r: 8+Math.random()*10, c: colors[Math.floor(Math.random()*colors.length)] });
+// GRAVITY PANDAS
+const gc=document.getElementById('gravity-canvas');
+gc.width=gc.offsetWidth;gc.height=200;
+const gctx=gc.getContext('2d');
+const balls=[];
+gc.onclick=(e)=>{
+  const r=gc.getBoundingClientRect();
+  balls.push({x:e.clientX-r.left,y:e.clientY-r.top,vx:(Math.random()-0.5)*4,vy:-3,r:16});
 };
 function animGravity(){
   gctx.clearRect(0,0,gc.width,gc.height);
-  balls.forEach(b => {
-    b.vy += 0.3; b.x += b.vx; b.y += b.vy;
-    if(b.y+b.r>gc.height){ b.y=gc.height-b.r; b.vy*=-0.65; b.vx*=0.95; }
-    if(b.x-b.r<0){ b.x=b.r; b.vx*=-0.7; }
-    if(b.x+b.r>gc.width){ b.x=gc.width-b.r; b.vx*=-0.7; }
-    gctx.beginPath(); gctx.arc(b.x,b.y,b.r,0,Math.PI*2); gctx.fillStyle=b.c; gctx.fill();
+  balls.forEach(b=>{
+    b.vy+=0.35;b.x+=b.vx;b.y+=b.vy;
+    if(b.y+b.r>gc.height){b.y=gc.height-b.r;b.vy*=-0.6;b.vx*=0.95;}
+    if(b.x-b.r<0){b.x=b.r;b.vx*=-0.7;}
+    if(b.x+b.r>gc.width){b.x=gc.width-b.r;b.vx*=-0.7;}
+    gctx.font='28px serif';gctx.fillText('🐼',b.x-14,b.y+10);
   });
-  if(balls.length>40) balls.splice(0,1);
+  if(balls.length>30)balls.splice(0,1);
   requestAnimationFrame(animGravity);
 }
 animGravity();
 
-const spinner = document.getElementById('spinner');
-const spinCount = document.getElementById('spin-count');
-let angle=0, spins=0, spinning=false, spinV=0;
-spinner.onclick = () => { spinV+=40; spinning=true; };
+// SPINNER
+const spinner=document.getElementById('spinner'),spinCount=document.getElementById('spin-count');
+let angle=0,spins=0,spinV=0;
+spinner.onclick=()=>{spinV+=40;};
 function animSpin(){
-  if(spinning){
-    angle+=spinV; spinV*=0.96;
-    spinner.style.transform=`rotate(${angle}deg)`;
-    const newSpins=Math.floor(angle/360);
-    if(newSpins>spins){ spins=newSpins; spinCount.textContent=spins; }
-    if(spinV<0.5) spinning=false;
-  }
+  if(spinV>0.1){angle+=spinV;spinV*=0.96;spinner.style.transform=`rotate(${angle}deg)`;const ns=Math.floor(angle/360);if(ns>spins){spins=ns;spinCount.textContent=spins;}}
   requestAnimationFrame(animSpin);
 }
 animSpin();
 
-const rc = document.getElementById('ripple-canvas');
-rc.width=rc.offsetWidth; rc.height=200;
-const rctx = rc.getContext('2d');
-const ripples = [];
-rc.onclick = (e) => {
-  const r=rc.getBoundingClientRect();
-  ripples.push({ x:e.clientX-r.left, y:e.clientY-r.top, radius:0, alpha:1, color:colors[Math.floor(Math.random()*colors.length)] });
-};
+// RIPPLE
+const rc=document.getElementById('ripple-canvas');rc.width=rc.offsetWidth;rc.height=200;
+const rctx=rc.getContext('2d'),ripples=[],rcols=['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#c77dff','#ff9f43'];
+rc.onclick=(e)=>{const r=rc.getBoundingClientRect();ripples.push({x:e.clientX-r.left,y:e.clientY-r.top,radius:0,alpha:1,color:rcols[Math.floor(Math.random()*rcols.length)]});};
 function animRipple(){
   rctx.clearRect(0,0,rc.width,rc.height);
-  for(let i=ripples.length-1;i>=0;i--){
-    const rp=ripples[i]; rp.radius+=3; rp.alpha-=0.015;
-    if(rp.alpha<=0){ ripples.splice(i,1); continue; }
-    rctx.beginPath(); rctx.arc(rp.x,rp.y,rp.radius,0,Math.PI*2);
-    rctx.strokeStyle=rp.color; rctx.globalAlpha=rp.alpha; rctx.lineWidth=2; rctx.stroke(); rctx.globalAlpha=1;
-  }
+  for(let i=ripples.length-1;i>=0;i--){const rp=ripples[i];rp.radius+=3;rp.alpha-=0.015;if(rp.alpha<=0){ripples.splice(i,1);continue;}rctx.beginPath();rctx.arc(rp.x,rp.y,rp.radius,0,Math.PI*2);rctx.strokeStyle=rp.color;rctx.globalAlpha=rp.alpha;rctx.lineWidth=2;rctx.stroke();rctx.globalAlpha=1;}
   requestAnimationFrame(animRipple);
 }
 animRipple();
 
-const dc = document.getElementById('draw-canvas');
-dc.width=dc.offsetWidth; dc.height=200;
-const dctx = dc.getContext('2d');
-let drawing=false, drawColor='#ff6b6b', lastX=0, lastY=0;
-dctx.lineCap='round'; dctx.lineJoin='round'; dctx.lineWidth=3;
-dc.onmousedown=(e)=>{ drawing=true; const r=dc.getBoundingClientRect(); lastX=e.clientX-r.left; lastY=e.clientY-r.top; };
-dc.onmousemove=(e)=>{
-  if(!drawing) return;
-  const r=dc.getBoundingClientRect(); const x=e.clientX-r.left, y=e.clientY-r.top;
-  dctx.strokeStyle=drawColor; dctx.shadowBlur=10; dctx.shadowColor=drawColor;
-  dctx.beginPath(); dctx.moveTo(lastX,lastY); dctx.lineTo(x,y); dctx.stroke();
-  lastX=x; lastY=y;
-};
+// DRAW
+const dc=document.getElementById('draw-canvas');dc.width=dc.offsetWidth;dc.height=200;
+const dctx=dc.getContext('2d');let drawing=false,drawColor='#ff6b6b',lastX=0,lastY=0;
+dctx.lineCap='round';dctx.lineJoin='round';dctx.lineWidth=3;
+dc.onmousedown=(e)=>{drawing=true;const r=dc.getBoundingClientRect();lastX=e.clientX-r.left;lastY=e.clientY-r.top;};
+dc.onmousemove=(e)=>{if(!drawing)return;const r=dc.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;dctx.strokeStyle=drawColor;dctx.shadowBlur=10;dctx.shadowColor=drawColor;dctx.beginPath();dctx.moveTo(lastX,lastY);dctx.lineTo(x,y);dctx.stroke();lastX=x;lastY=y;};
 dc.onmouseup=dc.onmouseleave=()=>drawing=false;
-document.querySelectorAll('.color-btn').forEach(btn=>{
-  btn.onclick=()=>{
-    document.querySelectorAll('.color-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active'); drawColor=btn.dataset.color;
-  };
-});
+document.querySelectorAll('.color-btn').forEach(btn=>{btn.onclick=()=>{document.querySelectorAll('.color-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');drawColor=btn.dataset.color;};});
 document.getElementById('clear-draw').onclick=()=>dctx.clearRect(0,0,dc.width,dc.height);
 
+// PANDA CLICKER
 let clicks=0;
-const clickCount=document.getElementById('click-count');
-const bigBtn=document.getElementById('big-btn');
-const particlesEl=document.getElementById('click-particles');
-bigBtn.onclick=()=>{
-  clicks++; clickCount.textContent=clicks;
-  const p=document.createElement('div'); p.className='particle'; p.textContent='+1';
-  p.style.left=(Math.random()*80+10)+'%'; particlesEl.appendChild(p);
-  setTimeout(()=>p.remove(),800);
+const clickCount=document.getElementById('click-count'),pandaBtn=document.getElementById('panda-btn'),particlesEl=document.getElementById('click-particles');
+const pp=['🐼','🎋','🐾','🎍','💚'];
+pandaBtn.onclick=()=>{clicks++;clickCount.textContent=clicks;const p=document.createElement('div');p.className='particle';p.textContent=pp[Math.floor(Math.random()*pp.length)];p.style.left=(Math.random()*80+10)+'%';particlesEl.appendChild(p);setTimeout(()=>p.remove(),900);};
+
+// WHACK A PANDA
+const whackGrid=document.getElementById('whack-grid');
+const wScoreEl=document.getElementById('whack-score'),wTimerEl=document.getElementById('whack-timer'),wStartBtn=document.getElementById('whack-start'),wBestEl=document.getElementById('whack-best');
+let wScore=0,wTime=30,wInterval=null,wTInterval=null,wBest=0;
+const holes=[];
+for(let i=0;i<12;i++){const h=document.createElement('div');h.className='hole';h.textContent='🌑';holes.push(h);whackGrid.appendChild(h);}
+function showPanda(){const av=holes.filter(h=>!h.classList.contains('active'));if(!av.length)return;const h=av[Math.floor(Math.random()*av.length)];h.classList.add('active');h.textContent='🐼';const t=setTimeout(()=>{h.classList.remove('active');h.textContent='🌑';},900);h._t=t;}
+wStartBtn.onclick=()=>{
+  wScore=0;wTime=30;wScoreEl.textContent=0;wTimerEl.textContent=30;
+  wStartBtn.disabled=true;wStartBtn.textContent='playing...';wBestEl.textContent='';
+  holes.forEach(h=>{h.classList.remove('active');h.textContent='🌑';});
+  wInterval=setInterval(showPanda,600);
+  wTInterval=setInterval(()=>{wTime--;wTimerEl.textContent=wTime;if(wTime<=0){clearInterval(wInterval);clearInterval(wTInterval);holes.forEach(h=>{clearTimeout(h._t);h.classList.remove('active');h.textContent='🌑';});if(wScore>wBest)wBest=wScore;wBestEl.textContent=`best: ${wBest} 🏆`;wStartBtn.disabled=false;wStartBtn.textContent='play again';}},1000);
 };
+holes.forEach(h=>{h.onclick=()=>{if(h.classList.contains('active')){wScore++;wScoreEl.textContent=wScore;h.textContent='😵';clearTimeout(h._t);setTimeout(()=>{h.classList.remove('active');h.textContent='🌑';},300);}};});
+
+// CATCH THE PANDA
+const catchArea=document.getElementById('catch-area'),runningPanda=document.getElementById('running-panda');
+const cCountEl=document.getElementById('catch-count'),mCountEl=document.getElementById('miss-count'),cTimerEl=document.getElementById('catch-timer'),cStartBtn=document.getElementById('catch-start'),cBestEl=document.getElementById('catch-best');
+let cCount=0,mCount=0,cTime=30,cInterval=null,cTInterval=null,cRunning=false,cBest=0;
+let px=50,py=50,pvx=3,pvy=2;
+function movePanda(){
+  const mw=catchArea.offsetWidth-40,mh=catchArea.offsetHeight-40;
+  px+=pvx;py+=pvy;
+  if(px<0){px=0;pvx*=-1;}if(px>mw){px=mw;pvx*=-1;}
+  if(py<0){py=0;pvy*=-1;}if(py>mh){py=mh;pvy*=-1;}
+  runningPanda.style.left=px+'px';runningPanda.style.top=py+'px';
+}
+cStartBtn.onclick=()=>{
+  cCount=0;mCount=0;cTime=30;cCountEl.textContent=0;mCountEl.textContent=0;cTimerEl.textContent=30;
+  cStartBtn.disabled=true;cStartBtn.textContent='running...';cBestEl.textContent='';
+  cRunning=true;pvx=(Math.random()>0.5?1:-1)*3;pvy=(Math.random()>0.5?1:-1)*2;
+  cInterval=setInterval(movePanda,16);
+  cTInterval=setInterval(()=>{cTime--;cTimerEl.textContent=cTime;if(cTime<=0){clearInterval(cInterval);clearInterval(cTInterval);cRunning=false;if(cCount>cBest)cBest=cCount;cBestEl.textContent=`best: ${cBest} caught 🏆`;cStartBtn.disabled=false;cStartBtn.textContent='play again';runningPanda.style.left='50px';runningPanda.style.top='50px';}},1000);
+};
+runningPanda.onclick=(e)=>{if(!cRunning)return;e.stopPropagation();cCount++;cCountEl.textContent=cCount;runningPanda.textContent='😵';pvx*=1.1;pvy*=1.1;setTimeout(()=>runningPanda.textContent='🐼',300);};
+catchArea.onclick=()=>{if(!cRunning)return;mCount++;mCountEl.textContent=mCount;};
 </script>
 </body>
 </html>
